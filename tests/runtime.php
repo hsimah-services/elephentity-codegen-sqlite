@@ -60,3 +60,31 @@ generated($request, function (string $directory): void {
     check($partial->query("SELECT count(*) FROM sqlite_master WHERE name='owner'")->fetchColumn() === 0, 'Failed installation did not roll back newly created tables');
     echo "PASS: generated constraints, hostile literals, NULL, foreign keys and installation rollback\n";
 });
+
+require __DIR__ . '/fixtures/PostStatus.php';
+$request = fixture('many-to-one');
+$request['schema']['types']['PostStatus'] = ['name' => 'PostStatus', 'primitive' => 'int', 'values' => ['draft', 'scheduled', 'published'], 'sourceFile' => 'status.yml'];
+$request['schema']['entities']['Target']['fields']['name']['type'] = ['primitive' => null, 'declaredType' => 'PostStatus'];
+$request['schema']['entities']['Target']['fields']['name']['enum'] = ['inlineValues' => null, 'declaredType' => 'PostStatus'];
+foreach ([false, true] as $enumPrimitive) {
+    if ($enumPrimitive) $request['schema']['entities']['Target']['fields']['name']['type']['primitive'] = 'enum';
+    generated($request, function (string $directory): void {
+        $db = new Database(':memory:');
+        $install = require $directory . '/install.php'; $install($db->pdo);
+        $manifest = require $directory . '/storage-manifest.php';
+        $adapter = new SQLiteAdaptor($db, $manifest->tables, new FieldMap($manifest->columns), $manifest->placements);
+        $encoder = new \Eleph\Runtime\UnitOfWork\ValueEncoder([], new \Eleph\Runtime\Type\NullProcessorRegistry());
+        foreach (\App\Elephentity\Enum\PostStatus::cases() as $case) {
+            $pending = new \Eleph\Runtime\Identity\PendingId('Target');
+            $value = $encoder->encode('Target', 'name', $case);
+            $result = $adapter->write(new \Eleph\Runtime\Storage\Write\WriteBatch(new \Eleph\Runtime\Storage\Write\Insert('Target', $pending, ['name' => $value])));
+            $id = $result->idFor($pending);
+            check($adapter->get('Target', $id)->value('name') === $case->value, 'Generated PHP integer enum backing value was not stored');
+            $adapter->write(new \Eleph\Runtime\Storage\Write\WriteBatch(new \Eleph\Runtime\Storage\Write\Update('Target', $id, ['name' => 2])));
+        }
+        fails(fn () => $db->insert('target', ['name' => 'draft']), 'Integer enum must reject domain labels');
+        fails(fn () => $db->insert('target', ['name' => -1]), 'Integer enum must reject negative ordinals');
+        fails(fn () => $db->insert('target', ['name' => 3]), 'Integer enum must reject out-of-range ordinals');
+        echo "PASS: generated PHP integer enums through SQLite schema and adapter\n";
+    });
+}

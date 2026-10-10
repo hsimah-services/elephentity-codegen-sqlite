@@ -126,9 +126,18 @@ impl Table {
 fn field(schema: &Value, f: &Value) -> Result<Column> {
     let name = snake(s(&f["name"]));
     let declared = &schema["types"][s(&f["type"]["declaredType"])];
-    let primitive = f["type"]["primitive"]
+    let mut primitive = f["type"]["primitive"]
         .as_str()
         .unwrap_or(s(&declared["primitive"]));
+    let enum_type = if !declared["values"].is_null() {
+        declared
+    } else {
+        &schema["types"][s(&f["enum"]["declaredType"])]
+    };
+    let integer_enum = !enum_type["values"].is_null() && enum_type["primitive"] == "int";
+    if integer_enum {
+        primitive = "int";
+    }
     let ty = match primitive {
         "string" | "text" | "datetime" | "enum" | "json" => "TEXT",
         "int" | "bool" | "id" => "INTEGER",
@@ -162,7 +171,12 @@ fn field(schema: &Value, f: &Value) -> Result<Column> {
             sql_name(&name),
             values
                 .iter()
-                .map(|v| sql_string(s(v)))
+                .enumerate()
+                .map(|(i, v)| if integer_enum {
+                    i.to_string()
+                } else {
+                    sql_string(s(v))
+                })
                 .collect::<Vec<_>>()
                 .join(", ")
         ));
