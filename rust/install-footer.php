@@ -3,7 +3,8 @@
     try {
         foreach ($statements as $sql) {
             if ($database->exec($sql) === false) {
-                throw new \RuntimeException('SQLite schema installation failed: ' . ($database->errorInfo()[2] ?? 'unknown error'));
+                $detail = $database->errorInfo()[2] ?? null;
+                throw new \RuntimeException('SQLite schema installation failed: ' . (is_string($detail) ? $detail : 'unknown error'));
             }
         }
         $database->commit();
