@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ed303687338a4f0802920a8106e1e299",
+    "content-hash": "4294e78882bb6246ca58fd4058aea388",
     "packages": [
         {
             "name": "elephentity/runtime",
-            "version": "v0.10.0",
+            "version": "v0.14.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-runtime.git",
-                "reference": "f3190c28d60e3e2e5f463f59e7d0992d1f700efd"
+                "reference": "399619b88c28590b4ac1bec6bef6e5ac4592c2b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-runtime/zipball/f3190c28d60e3e2e5f463f59e7d0992d1f700efd",
-                "reference": "f3190c28d60e3e2e5f463f59e7d0992d1f700efd",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-runtime/zipball/399619b88c28590b4ac1bec6bef6e5ac4592c2b4",
+                "reference": "399619b88c28590b4ac1bec6bef6e5ac4592c2b4",
                 "shasum": ""
             },
             "require": {
@@ -38,31 +38,31 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache-2.0"
+                "MIT"
             ],
             "description": "Elephentity runtime contracts: storage port, unit of work, verification, loaders.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-runtime/issues",
-                "source": "https://github.com/hsimah-services/elephentity-runtime/tree/v0.10.0"
+                "source": "https://github.com/hsimah-services/elephentity-runtime/tree/v0.14.1"
             },
-            "time": "2026-09-22T00:43:04+00:00"
+            "time": "2026-10-18T22:32:08+00:00"
         },
         {
             "name": "elephentity/sqlite",
-            "version": "v0.1.0-alpha.1",
+            "version": "v0.1.0-alpha.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-sqlite.git",
-                "reference": "3692cd719ffe75e35ce2f9d9ed3fb116a37997d7"
+                "reference": "c7ae66a3bec4fda12cb55bab301f38faff2b7833"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-sqlite/zipball/3692cd719ffe75e35ce2f9d9ed3fb116a37997d7",
-                "reference": "3692cd719ffe75e35ce2f9d9ed3fb116a37997d7",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-sqlite/zipball/c7ae66a3bec4fda12cb55bab301f38faff2b7833",
+                "reference": "c7ae66a3bec4fda12cb55bab301f38faff2b7833",
                 "shasum": ""
             },
             "require": {
-                "elephentity/runtime": "^0.10",
+                "elephentity/runtime": "^0.13.1 || ^0.14",
                 "ext-mbstring": "*",
                 "ext-pdo": "*",
                 "ext-pdo_sqlite": "*",
@@ -74,15 +74,20 @@
                     "Eleph\\SQLite\\": "src/"
                 }
             },
+            "scripts": {
+                "test": [
+                    "@php tests/regressions.php"
+                ]
+            },
             "license": [
-                "Apache-2.0"
+                "MIT"
             ],
             "description": "Experimental SQLite storage adaptor for the Elephentity PHP runtime.",
             "support": {
-                "source": "https://github.com/hsimah-services/elephentity-sqlite/tree/v0.1.0-alpha.1",
+                "source": "https://github.com/hsimah-services/elephentity-sqlite/tree/v0.1.0-alpha.7",
                 "issues": "https://github.com/hsimah-services/elephentity-sqlite/issues"
             },
-            "time": "2026-09-27T15:37:29+00:00"
+            "time": "2026-10-19T19:13:23+00:00"
         },
         {
             "name": "psr/container",
