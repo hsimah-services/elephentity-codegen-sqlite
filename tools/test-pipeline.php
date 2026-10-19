@@ -13,11 +13,17 @@ $config = json_decode(file_get_contents($example . '/eleph.json'), true, flags: 
 $config['codegen'] = $workspace . '/elephentity-codegen/bin/eleph-codegen';
 foreach (['php', 'sqlite', 'graphql-php'] as $target) $config['targets'][$target]['builder'] = $workspace . '/elephentity-codegen-' . $target . '/bin/eleph-gen-' . $target;
 file_put_contents($project . '/eleph.json', json_encode($config, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
-$base = [PHP_BINARY, '-d', 'auto_prepend_file=' . $workspace . '/elephentity-codegen-graphql-php/tests/vendor/autoload.php', $workspace . '/elephentity/packages/cli/bin/eleph'];
+// eleph-check-php loads the project's own autoloader, so this one stands in for a project's vendor/.
+mkdir($project . '/vendor');
+file_put_contents($project . '/vendor/autoload.php', '<?php require ' . var_export($workspace . '/elephentity-codegen-graphql-php/tests/vendor/autoload.php', true) . ";\n");
+$base = [getenv('ELEPH') ?: 'eleph'];
+// `eleph check` runs the PHP builder's checker by name, which a Composer project finds in vendor/bin.
+$environment = getenv();
+$environment['PATH'] = $workspace . '/elephentity-codegen-php/bin:' . ($environment['PATH'] ?? '');
 try {
     foreach ([['generate'], ['generate', '--check'], ['check']] as $arguments) {
         $command = [...$base, ...$arguments, '--project', $project];
-        $process = proc_open($command, [0 => ['pipe', 'r'], 1 => STDOUT, 2 => STDERR], $pipes);
+        $process = proc_open($command, [0 => ['pipe', 'r'], 1 => STDOUT, 2 => STDERR], $pipes, null, $environment);
         fclose($pipes[0]);
         if (proc_close($process) !== 0) throw new RuntimeException('Pipeline command failed: ' . implode(' ', $arguments));
     }

@@ -112,8 +112,10 @@ run the upstream adapter conformance harness for every relationship shape. They
 also check constraints, identifier prefixes, NULL, literal escaping and rollback.
 
 [The standalone example](examples/standalone/eleph.json) combines PHP, SQLite and
-GraphQL PHP generation. In the sibling-repository workspace, with the core's Composer
-dependencies and all three builders plus the orchestrator built, run:
+GraphQL PHP generation. With `eleph` on PATH (`install.sh`, or set `ELEPH`), and in the
+sibling-repository workspace with all three builders plus the orchestrator built and their
+test dependencies installed (`composer install` in `elephentity-codegen-php` and in each
+builder's `tests/`), run:
 
 ```sh
 php tools/test-pipeline.php /path/to/elephentity-dev
